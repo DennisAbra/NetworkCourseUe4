@@ -1,0 +1,2 @@
+C:\Users\Dennis.Abramsson\Desktop\Github repository\UE4\Network\NetworkCourseUe4\FGNet\Intermediate\Build\Win64\UE4Editor\Development\FGNet\Definitions.FGNet.h
+C:\Users\Dennis.Abramsson\Desktop\Github repository\UE4\Network\NetworkCourseUe4\FGNet\Source\FGNet\FGNet.h

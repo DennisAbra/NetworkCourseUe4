@@ -1,0 +1,135 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <None Include="..\..\FGNet.uproject" />
+    <Filter Include="Source">
+      <UniqueIdentifier>{E6EA4B12-E82A-40A0-94D9-B4D8E61E2F4F}</UniqueIdentifier>
+    </Filter>
+    <None Include="..\..\Source\FGNet.Target.cs">
+      <Filter>Source</Filter>
+    </None>
+    <None Include="..\..\Source\FGNetEditor.Target.cs">
+      <Filter>Source</Filter>
+    </None>
+    <Filter Include="Config">
+      <UniqueIdentifier>{A6F4EE6A-F11A-4FBC-B979-CEDF9329B4D8}</UniqueIdentifier>
+    </Filter>
+    <None Include="..\..\Config\DefaultEditor.ini">
+      <Filter>Config</Filter>
+    </None>
+    <None Include="..\..\Config\DefaultEngine.ini">
+      <Filter>Config</Filter>
+    </None>
+    <None Include="..\..\Config\DefaultGame.ini">
+      <Filter>Config</Filter>
+    </None>
+    <Filter Include="Config\Android">
+      <UniqueIdentifier>{BA468C9B-1799-4DA9-AD62-2BD051AEF884}</UniqueIdentifier>
+    </Filter>
+    <None Include="..\..\Config\Android\AndroidEngine.ini">
+      <Filter>Config\Android</Filter>
+    </None>
+    <Filter Include="Config\IOS">
+      <UniqueIdentifier>{DECDE027-107A-4FF7-96D2-8FD9E6F8B8F3}</UniqueIdentifier>
+    </Filter>
+    <None Include="..\..\Config\IOS\IOSEngine.ini">
+      <Filter>Config\IOS</Filter>
+    </None>
+    <Filter Include="Config\Linux">
+      <UniqueIdentifier>{5BC25B04-0EEA-40A6-9DDC-57446DBC65C6}</UniqueIdentifier>
+    </Filter>
+    <None Include="..\..\Config\Linux\LinuxEngine.ini">
+      <Filter>Config\Linux</Filter>
+    </None>
+    <Filter Include="Config\Mac">
+      <UniqueIdentifier>{37439819-D1C3-4087-8C38-2113B96A91A9}</UniqueIdentifier>
+    </Filter>
+    <None Include="..\..\Config\Mac\MacEngine.ini">
+      <Filter>Config\Mac</Filter>
+    </None>
+    <Filter Include="Config\PS4">
+      <UniqueIdentifier>{4158E0C7-ED67-4762-8A27-4B318F8E6BBB}</UniqueIdentifier>
+    </Filter>
+    <None Include="..\..\Config\PS4\PS4Engine.ini">
+      <Filter>Config\PS4</Filter>
+    </None>
+    <Filter Include="Config\Switch">
+      <UniqueIdentifier>{DC9D4667-1218-45F2-9019-9BA8C9604AF8}</UniqueIdentifier>
+    </Filter>
+    <None Include="..\..\Config\Switch\SwitchEngine.ini">
+      <Filter>Config\Switch</Filter>
+    </None>
+    <Filter Include="Config\Windows">
+      <UniqueIdentifier>{A5AA5A72-649B-40A6-A072-1046F77B8423}</UniqueIdentifier>
+    </Filter>
+    <None Include="..\..\Config\Windows\WindowsEngine.ini">
+      <Filter>Config\Windows</Filter>
+    </None>
+    <Filter Include="Config\XboxOne">
+      <UniqueIdentifier>{3BFFCA82-9A07-4DE6-9319-D7851D1B0F64}</UniqueIdentifier>
+    </Filter>
+    <None Include="..\..\Config\XboxOne\XboxOneEngine.ini">
+      <Filter>Config\XboxOne</Filter>
+    </None>
+    <Filter Include="Source\FGNet">
+      <UniqueIdentifier>{6BEC7FBD-C918-4060-8799-B3B59F142239}</UniqueIdentifier>
+    </Filter>
+    <None Include="..\..\Source\FGNet\FGNet.Build.cs">
+      <Filter>Source\FGNet</Filter>
+    </None>
+    <ClCompile Include="..\..\Source\FGNet\FGNet.cpp">
+      <Filter>Source\FGNet</Filter>
+    </ClCompile>
+    <ClInclude Include="..\..\Source\FGNet\FGNet.h">
+      <Filter>Source\FGNet</Filter>
+    </ClInclude>
+    <ClCompile Include="..\..\Source\FGNet\FGNetGameModeBase.cpp">
+      <Filter>Source\FGNet</Filter>
+    </ClCompile>
+    <ClInclude Include="..\..\Source\FGNet\FGNetGameModeBase.h">
+      <Filter>Source\FGNet</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Source\FGNet\Components">
+      <UniqueIdentifier>{6ebb904c-3637-4818-b63f-f5d56cd9805e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\FGNet\Debug">
+      <UniqueIdentifier>{feaec265-d0ac-4fcd-b029-8a506cb6fe38}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\FGNet\Player">
+      <UniqueIdentifier>{5097e21e-258a-477e-af9c-1e20d93a4c52}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\FGNet\Debug\UI">
+      <UniqueIdentifier>{5354f870-5457-4d12-b1a0-ae1d593ebdf8}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="FGMovementComponent.cpp">
+      <Filter>Source\FGNet\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="FGNetDebugWidget.cpp">
+      <Filter>Source\FGNet\Debug\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="FGPlayer.cpp">
+      <Filter>Source\FGNet\Player</Filter>
+    </ClCompile>
+    <ClCompile Include="FGMovementStatics.cpp">
+      <Filter>Source\FGNet</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="FGMovementComponent.h">
+      <Filter>Source\FGNet\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="FGNetDebugWidget.h">
+      <Filter>Source\FGNet\Debug\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="FGPlayer.h">
+      <Filter>Source\FGNet\Player</Filter>
+    </ClInclude>
+    <ClInclude Include="FGMovementStatics.h">
+      <Filter>Source\FGNet</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

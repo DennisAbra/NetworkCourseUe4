@@ -1,0 +1,14 @@
+{
+	"Targets": [
+		{
+			"Name": "FGNet",
+			"Path": "C:\\Users\\Dennis.Abramsson\\Desktop\\Github repository\\UE4\\Network\\NetworkCourseUe4\\FGNet\\Source\\FGNet.Target.cs",
+			"Type": "Game"
+		},
+		{
+			"Name": "FGNetEditor",
+			"Path": "C:\\Users\\Dennis.Abramsson\\Desktop\\Github repository\\UE4\\Network\\NetworkCourseUe4\\FGNet\\Source\\FGNetEditor.Target.cs",
+			"Type": "Editor"
+		}
+	]
+}
