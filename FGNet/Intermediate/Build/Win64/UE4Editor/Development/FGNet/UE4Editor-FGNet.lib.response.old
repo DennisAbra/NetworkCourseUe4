@@ -1,0 +1,20 @@
+/NOLOGO
+/errorReport:prompt
+/MACHINE:x64
+/SUBSYSTEM:WINDOWS
+/DEF
+/NAME:"UE4Editor-FGNet.dll"
+/IGNORE:4221
+/NODEFAULTLIB
+"C:\Users\Dennis.Abramsson\Desktop\Github repository\UE4\Network\NetworkCourseUe4\FGNet\Intermediate\Build\Win64\FGNetEditor\Development\Engine\SharedPCH.Engine.ShadowErrors.h.obj"
+"C:\Users\Dennis.Abramsson\Desktop\Github repository\UE4\Network\NetworkCourseUe4\FGNet\Intermediate\Build\Win64\UE4Editor\Development\FGNet\FGMovementComponent.cpp.obj"
+"C:\Users\Dennis.Abramsson\Desktop\Github repository\UE4\Network\NetworkCourseUe4\FGNet\Intermediate\Build\Win64\UE4Editor\Development\FGNet\FGPlayer.cpp.obj"
+"C:\Users\Dennis.Abramsson\Desktop\Github repository\UE4\Network\NetworkCourseUe4\FGNet\Intermediate\Build\Win64\UE4Editor\Development\FGNet\FGNet.cpp.obj"
+"C:\Users\Dennis.Abramsson\Desktop\Github repository\UE4\Network\NetworkCourseUe4\FGNet\Intermediate\Build\Win64\UE4Editor\Development\FGNet\FGNetGameModeBase.cpp.obj"
+"C:\Users\Dennis.Abramsson\Desktop\Github repository\UE4\Network\NetworkCourseUe4\FGNet\Intermediate\Build\Win64\UE4Editor\Development\FGNet\FGMovementComponent.gen.cpp.obj"
+"C:\Users\Dennis.Abramsson\Desktop\Github repository\UE4\Network\NetworkCourseUe4\FGNet\Intermediate\Build\Win64\UE4Editor\Development\FGNet\FGNet.init.gen.cpp.obj"
+"C:\Users\Dennis.Abramsson\Desktop\Github repository\UE4\Network\NetworkCourseUe4\FGNet\Intermediate\Build\Win64\UE4Editor\Development\FGNet\FGNetGameModeBase.gen.cpp.obj"
+"C:\Users\Dennis.Abramsson\Desktop\Github repository\UE4\Network\NetworkCourseUe4\FGNet\Intermediate\Build\Win64\UE4Editor\Development\FGNet\FGPlayer.gen.cpp.obj"
+"C:\Users\Dennis.Abramsson\Desktop\Github repository\UE4\Network\NetworkCourseUe4\FGNet\Intermediate\Build\Win64\UE4Editor\Development\FGNet\Default.rc2.res"
+/OUT:"C:\Users\Dennis.Abramsson\Desktop\Github repository\UE4\Network\NetworkCourseUe4\FGNet\Intermediate\Build\Win64\UE4Editor\Development\FGNet\UE4Editor-FGNet.lib"
+/INCLUDE:IMPLEMENT_MODULE_FGNet

@@ -1,4 +1,12 @@
 ﻿  Using 'git status' to determine working set for adaptive non-unity build (C:\Users\Dennis.Abramsson\Desktop\Github repository\UE4\Network\NetworkCourseUe4).
-  Creating makefile for FGNetEditor (game project files are newer)
-  Target is up to date
-  Total execution time: 1,44 seconds
+  Building FGNetEditor...
+  Using Visual Studio 2019 14.24.28314 toolchain (C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.24.28314) and Windows 10.0.18362.0 SDK (C:\Program Files (x86)\Windows Kits\10).
+  Building 4 actions with 6 processes...
+    [1/4] FGPlayer.cpp
+    [2/4] UE4Editor-FGNet.lib
+       Creating library C:\Users\Dennis.Abramsson\Desktop\Github repository\UE4\Network\NetworkCourseUe4\FGNet\Intermediate\Build\Win64\UE4Editor\Development\FGNet\UE4Editor-FGNet.lib and object C:\Users\Dennis.Abramsson\Desktop\Github repository\UE4\Network\NetworkCourseUe4\FGNet\Intermediate\Build\Win64\UE4Editor\Development\FGNet\UE4Editor-FGNet.exp
+    [3/4] UE4Editor-FGNet.dll
+       Creating library C:\Users\Dennis.Abramsson\Desktop\Github repository\UE4\Network\NetworkCourseUe4\FGNet\Intermediate\Build\Win64\UE4Editor\Development\FGNet\UE4Editor-FGNet.suppressed.lib and object C:\Users\Dennis.Abramsson\Desktop\Github repository\UE4\Network\NetworkCourseUe4\FGNet\Intermediate\Build\Win64\UE4Editor\Development\FGNet\UE4Editor-FGNet.suppressed.exp
+    [4/4] FGNetEditor.target
+  Total time in Parallel executor: 1,56 seconds
+  Total execution time: 2,06 seconds

@@ -283,20 +283,19 @@
     <AdditionalOptions>/std:c++14</AdditionalOptions>
   </PropertyGroup>
   <ItemGroup>
-    <ClCompile Include="FGMovementComponent.cpp" />
-    <ClCompile Include="FGMovementStatics.cpp" />
-    <ClCompile Include="FGNetDebugWidget.cpp" />
-    <ClCompile Include="FGPlayer.cpp" />
-    <ClInclude Include="FGMovementComponent.h" />
-    <ClInclude Include="FGMovementStatics.h" />
-    <ClInclude Include="FGNetDebugWidget.h" />
-    <ClInclude Include="FGPlayer.h" />
+    <ClCompile Include="..\..\Source\FGNet\Components\FGMovementComponent.cpp" />
+    <ClCompile Include="..\..\Source\FGNet\FGMovementStatics.cpp" />
+    <ClCompile Include="..\..\Source\FGNet\Player\FGPlayer.cpp" />
+    <ClInclude Include="..\..\Source\FGNet\Components\FGMovementComponent.h" />
+    <ClInclude Include="..\..\Source\FGNet\FGMovementStatics.h" />
+    <ClInclude Include="..\..\Source\FGNet\Player\FGPlayer.h" />
     <None Include="..\..\FGNet.uproject" />
     <None Include="..\..\Source\FGNet.Target.cs" />
     <None Include="..\..\Source\FGNetEditor.Target.cs" />
     <None Include="..\..\Config\DefaultEditor.ini" />
     <None Include="..\..\Config\DefaultEngine.ini" />
     <None Include="..\..\Config\DefaultGame.ini" />
+    <None Include="..\..\Config\DefaultInput.ini" />
     <None Include="..\..\Config\Android\AndroidEngine.ini" />
     <None Include="..\..\Config\IOS\IOSEngine.ini" />
     <None Include="..\..\Config\Linux\LinuxEngine.ini" />
