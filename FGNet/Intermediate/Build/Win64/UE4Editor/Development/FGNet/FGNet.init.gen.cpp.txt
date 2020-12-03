@@ -1,3 +1,0 @@
-C:\Users\Dennis.Abramsson\Desktop\Github repository\UE4\Network\NetworkCourseUe4\FGNet\Intermediate\Build\Win64\UE4Editor\Development\FGNet\Definitions.FGNet.h
-C:\Program Files\Epic Games\UE_4.25\Engine\Source\Runtime\CoreUObject\Public\UObject/GeneratedCppIncludes.h
-C:\Program Files\Epic Games\UE_4.25\Engine\Source\Runtime\CoreUObject\Public\UObject/MetaData.h

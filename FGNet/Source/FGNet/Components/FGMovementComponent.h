@@ -23,7 +23,7 @@ public:
 
 	FVector GetGravityAsVector() const { return FVector(0.0f, 0.0f, AccumulatedGravity); }
 	FRotator GetFacingRotation() const { return FacingRotationCurrent; }
-	FVector GetFaceingDirection() const { return FacingRotationCurrent.Vector(); }
+	FVector GetFacingDirection() const { return FacingRotationCurrent.Vector(); }
 
 	void SetFacingRotation(const FRotator& InFaciongRotation, float InRotationSpeed = -1.0f);
 	void SetFacingRotation(const FQuat& InFacingDirection, float InRotationSpeed = -1.0f);

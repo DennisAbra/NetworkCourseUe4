@@ -37,7 +37,7 @@ public:
 		float BrakingFriction = 0.001f;
 
 	UPROPERTY(EditAnywhere, Category = Movement, meta = (ClampMin = 0.0, ClampMax = 1.0))
-	float DefaultFriction = 0.75f;
+		float DefaultFriction = 0.75f;
 
 	UFUNCTION(BlueprintPure)
 		bool IsBraking() const { return bBrake; }
@@ -46,10 +46,16 @@ public:
 		int32 GetPing() const;
 
 	UFUNCTION(Server, Unreliable)
-	void Server_SendLocation(const FVector& LocationToSend);
+		void Server_SendLocation(const FVector& LocationToSend);
 
 	UFUNCTION(NetMulticast, Unreliable)
-	void Multicast_SendLocation(const FVector& LocationToSend);
+		void Multicast_SendLocation(const FVector& LocationToSend);
+
+	//UFUNCTION(Server, Unreliable)
+	//	void Server_SendRotation(const FRotator& RotationToSend);
+
+	//UFUNCTION(NetMulticast, Unreliable)
+	//	void MultiCast_SendRotation(const FRotator& RotationToSend);
 
 private:
 	void Handle_Accelerate(float Value);
