@@ -51,17 +51,22 @@ public:
 	UFUNCTION(NetMulticast, Unreliable)
 		void Multicast_SendLocation(const FVector& LocationToSend);
 
-	//UFUNCTION(Server, Unreliable)
-	//	void Server_SendRotation(const FRotator& RotationToSend);
+	UFUNCTION(Server, Unreliable)
+		void Server_SendRotation(const FRotator& RotationToSend);
 
-	//UFUNCTION(NetMulticast, Unreliable)
-	//	void MultiCast_SendRotation(const FRotator& RotationToSend);
+	UFUNCTION(NetMulticast, Unreliable)
+		void MultiCast_SendRotation(const FRotator& RotationToSend);
 
 private:
 	void Handle_Accelerate(float Value);
 	void Handle_Turn(float Value);
 	void Handle_BrakePressed();
 	void Handle_BrakeReleased();
+
+	FRotator InterpTargetRot;
+	FVector InterpTargetLoc;
+
+	float RotationSpeed = 0.0f;
 
 	float Forward = 0.0f;
 	float Turn = 0.0f;
