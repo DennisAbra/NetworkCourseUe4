@@ -44,12 +44,10 @@ void AFGPlayer::Tick(float DeltaTime)
 
 	if (IsLocallyControlled())
 	{
-
 		const float Friction = IsBraking() ? BrakingFriction : DefaultFriction;
 		const float Alpha = FMath::Clamp(FMath::Abs(MovementVelocity / (MaxVelocity * 0.75f)), 0.0f, 1.0f);
 		const float TurnSpeed = FMath::InterpEaseOut(0.0f, TurnSpeedDefault, Alpha, 5.0f);
 		const float MovementDirection = MovementVelocity > 0.0f ? Turn : -Turn;
-		RotationSpeed = TurnSpeed;
 
 		Yaw += (MovementDirection * TurnSpeed) * DeltaTime;
 		FQuat WantedFacingDirection = FQuat(FVector::UpVector, FMath::DegreesToRadians(Yaw));
@@ -71,7 +69,7 @@ void AFGPlayer::Tick(float DeltaTime)
 	}
 	else
 	{
-		const FVector NewLoc = FMath::VInterpTo(GetActorLocation(), InterpTargetLoc, DeltaTime, Acceleration);
+		const FVector NewLoc = FMath::VInterpTo(GetActorLocation(), InterpTargetLoc, DeltaTime, LocationSpeed);
 		SetActorLocation(NewLoc);
 		const FRotator NewRot = FMath::RInterpTo(GetActorRotation(), InterpTargetRot, DeltaTime, RotationSpeed);
 		SetActorRotation(NewRot);
@@ -108,7 +106,6 @@ void AFGPlayer::Multicast_SendLocation_Implementation(const FVector& LocationToS
 {
 	if (!IsLocallyControlled())
 		InterpTargetLoc = LocationToSend;
-	//	SetActorLocation(LocationToSend);
 }
 
 void AFGPlayer::Server_SendRotation_Implementation(const FRotator& RotationToSend)

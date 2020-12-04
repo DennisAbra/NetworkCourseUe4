@@ -9,6 +9,8 @@ class UFGMovementComponent;
 class UStaticMeshComponent;
 class USphereComponent;
 
+
+
 UCLASS()
 class FGNET_API AFGPlayer : public APawn
 {
@@ -66,7 +68,11 @@ private:
 	FRotator InterpTargetRot;
 	FVector InterpTargetLoc;
 
+	UPROPERTY(EditAnywhere, Category = Movement)
 	float RotationSpeed = 0.0f;
+
+	UPROPERTY(EditAnywhere, Category = Movement)
+		float LocationSpeed = 0.0f;
 
 	float Forward = 0.0f;
 	float Turn = 0.0f;
