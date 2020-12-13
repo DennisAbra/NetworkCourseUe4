@@ -3,6 +3,7 @@
 #include "Engine/World.h"
 #include "Kismet/GameplayStatics.h"
 #include "DrawDebugHelpers.h"
+#include "Player/FGPlayer.h"
 
 AFGRocket::AFGRocket()
 {
@@ -61,6 +62,11 @@ void AFGRocket::Tick(float DeltaTime)
 	if (Hit.bBlockingHit)
 	{
 		Explode();
+		//Deal damage here to Hit.Actor if it contains a health comp
+		if (AFGPlayer* Player = Cast<AFGPlayer>(Hit.GetActor()))
+		{
+			Player->OnTakeDamage(DamagePerRocket);
+		}
 	}
 
 	if (LifeTimeElapsed < 0.0f)

@@ -51,6 +51,9 @@ private:
 	UPROPERTY(EditAnywhere)
 	float MovementVelocity = 1300.0f;
 
+	UPROPERTY(EditAnywhere)
+		float DamagePerRocket = 5.0f;
+
 	bool bIsFree = true;
 
 

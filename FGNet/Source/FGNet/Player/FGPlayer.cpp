@@ -40,6 +40,10 @@ void AFGPlayer::BeginPlay()
 {
 	Super::BeginPlay();
 
+	CurrentHealth = MaxHealth;
+	ServerCurrentHealth = MaxHealth;
+	BP_OnHealthChanged(CurrentHealth);
+
 	MovementComponent->SetUpdatedComponent(CollisionComponent);
 	CreateDebugWidget();
 	if (DebugMenuInstance != nullptr)
@@ -128,11 +132,39 @@ void AFGPlayer::OnPickup(AFGPickup* Pickup)
 		Server_OnPickup(Pickup);
 }
 
+void AFGPlayer::Server_TakeDamage_Implementation(int32 DamageTaken)
+{
+	ServerCurrentHealth -= DamageTaken;
+	Client_TakeDamage(ServerCurrentHealth);
+	MultiCast_TakeDamage(DamageTaken);
+}
+
+void AFGPlayer::Client_TakeDamage_Implementation(int32 NewHealth)
+{
+	CurrentHealth = NewHealth;
+	BP_OnHealthChanged(CurrentHealth);
+}
+
+void AFGPlayer::MultiCast_TakeDamage_Implementation(int32 DamageToTake)
+{
+	if (!IsLocallyControlled())
+	{
+		CurrentHealth -= DamageToTake;
+		BP_OnHealthChanged(CurrentHealth);
+	}
+}
+
+void AFGPlayer::OnTakeDamage(int32 DamageToTake)
+{
+	if(IsLocallyControlled())
+	Server_TakeDamage(DamageToTake);
+}
+
 void AFGPlayer::Server_OnPickup_Implementation(AFGPickup* Pickup)
 {
 	ServerNumRocket += Pickup->NumRockets;
 	Client_OnPickupRockets(Pickup->NumRockets);
-	Server_OnPickupRockets(Pickup->NumRockets);
+	MultiCast_OnPickupRockets(Pickup->NumRockets);
 }
 
 void AFGPlayer::Client_OnPickupRockets_Implementation(int32 PickedUpRockets)
@@ -141,7 +173,7 @@ void AFGPlayer::Client_OnPickupRockets_Implementation(int32 PickedUpRockets)
 	BP_OnNumRcketsChanged(NumRockets);
 }
 
-void AFGPlayer::Server_OnPickupRockets_Implementation(int32 PickedUpRockets)
+void AFGPlayer::MultiCast_OnPickupRockets_Implementation(int32 PickedUpRockets)
 {
 	if (!IsLocallyControlled())
 	{
@@ -265,6 +297,7 @@ void AFGPlayer::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetim
 	DOREPLIFETIME(AFGPlayer, ReplicatedLocation);
 	DOREPLIFETIME(AFGPlayer, RocketInstances);
 	DOREPLIFETIME(AFGPlayer, NumRockets);
+	DOREPLIFETIME(AFGPlayer, CurrentHealth);
 
 }
 

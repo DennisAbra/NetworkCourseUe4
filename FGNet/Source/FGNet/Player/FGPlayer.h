@@ -57,7 +57,7 @@ public:
 	void Client_OnPickupRockets(int32 PickedUpRockets);
 
 	UFUNCTION(NetMulticast, Reliable)
-	void Server_OnPickupRockets(int32 PickedUpRockets);
+	void MultiCast_OnPickupRockets(int32 PickedUpRockets);
 
 	UFUNCTION(NetMulticast, Unreliable)
 	void Multicast_SendLocation(const FVector& LocationToSend);
@@ -83,7 +83,33 @@ public:
 
 	void SpawnRockets();
 
+	UFUNCTION(BlueprintImplementableEvent, Category = Health)
+	void BP_OnHealthChanged(int32 Health);
+
+	UFUNCTION(BlueprintCallable)
+		void OnTakeDamage(int32 DamageToTake);
+
 private:
+
+	UFUNCTION(Server, Reliable)
+	void Server_TakeDamage(int32 DamageTaken);
+
+	UFUNCTION(Client, Reliable)
+	void Client_TakeDamage(int32 NewHealth);
+
+	UFUNCTION(NetMulticast, Reliable)
+	void MultiCast_TakeDamage(int32 DamageToTake);
+
+
+
+	int32 ServerCurrentHealth = 0;
+
+	UPROPERTY(Replicated)
+	int32 CurrentHealth = 0;
+
+	UPROPERTY(EditAnywhere, Category = Health)
+	int32 MaxHealth;
+
 	int32 ServerNumRocket = 0;
 
 	UPROPERTY(Replicated)
