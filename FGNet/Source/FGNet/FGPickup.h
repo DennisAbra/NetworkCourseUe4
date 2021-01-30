@@ -38,6 +38,9 @@ public:
 	UPROPERTY(EditAnywhere)
 	float ReActivateTime = 5.0f;
 
+	UFUNCTION()
+	void DeActivatePickup();
+
 private:
 	FVector CachedMeshRelativeLocation = FVector::ZeroVector;
 	FTimerHandle ReActivateHandle;

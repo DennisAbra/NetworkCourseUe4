@@ -22,6 +22,7 @@ AFGPickup::AFGPickup()
 	MeshComponent->SetCollisionProfileName(TEXT("NoCollision"));
 
 	SetReplicates(true);
+	bReplicateSetActorHiddenInGame = false;
 
 }
 
@@ -53,10 +54,23 @@ void AFGPickup::Tick(float DeltaTime)
 	MeshComponent->AddRelativeRotation(FRotator(0.0f, 20.0f * DeltaTime, 0.0f), false, &Hit, ETeleportType::TeleportPhysics);
 }
 
+void AFGPickup::DeActivatePickup()
+{
+	bPickedUp = true;
+	SphereComponent->SetCollisionProfileName(TEXT("NoCollision"));
+	//RootComponent->SetVisibility(false, true);
+	bReplicateSetActorHiddenInGame = true;
+	SetActorHiddenInGame(true);
+	GetWorldTimerManager().SetTimer(ReActivateHandle, this, &AFGPickup::ReActivatePickup, ReActivateTime, false);
+	SetActorTickEnabled(false);
+}
+
 void AFGPickup::ReActivatePickup()
 {
 	bPickedUp = false;
-	RootComponent->SetVisibility(true, true);
+	//RootComponent->SetVisibility(true, true);
+	bReplicateSetActorHiddenInGame = true;
+	SetActorHiddenInGame(false);
 	SphereComponent->SetCollisionProfileName(TEXT("OverlapAllDynamic"));
 	SetActorTickEnabled(true);
 }
@@ -69,10 +83,5 @@ void AFGPickup::OverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherA
 	if (AFGPlayer* Player = Cast<AFGPlayer>(OtherActor))
 	{
 		Player->OnPickup(this);
-		bPickedUp = true;
-		SphereComponent->SetCollisionProfileName(TEXT("NoCollision"));
-		RootComponent->SetVisibility(false, true);
-		GetWorldTimerManager().SetTimer(ReActivateHandle, this, &AFGPickup::ReActivatePickup, ReActivateTime, false);
-		SetActorTickEnabled(false);
 	}
 }

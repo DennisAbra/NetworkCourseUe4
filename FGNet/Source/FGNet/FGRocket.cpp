@@ -26,7 +26,7 @@ void AFGRocket::BeginPlay()
 
 	CachedCollisionQueryParams.AddIgnoredActor(this);
 	//Owner is player who instantiate this
-	CachedCollisionQueryParams.AddIgnoredActor(GetOwner());
+	//CachedCollisionQueryParams.AddIgnoredActor(GetOwner());
 
 	SetRocketVisibility(false);
 }

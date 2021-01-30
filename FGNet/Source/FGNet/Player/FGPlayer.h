@@ -13,7 +13,71 @@ class UFGNetDebugWidget;
 class AFGPickup;
 class AFGRocket;
 
+USTRUCT()
+struct FMovementData
+{
+	GENERATED_USTRUCT_BODY()
+public:
+	UPROPERTY()
+		FVector Location;
+	UPROPERTY()
+		float ClientTimeStamp;
+	UPROPERTY()
+		float Forward;
 
+	UPROPERTY()
+	float YawRotation;
+
+	void SetData(const FVector& Loc, float TimeStamp, float Forw, float Yaw)
+	{
+		Location = Loc;
+		ClientTimeStamp = TimeStamp;
+		Forward = Forw;
+		YawRotation = Yaw;
+	}
+
+	bool NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSucess)
+	{
+		const bool bArLoading = Ar.IsLoading();
+
+		uint8 ByteYaw = 0;
+
+		if (!bArLoading)
+		{
+			ByteYaw = FRotator::CompressAxisToByte(YawRotation);
+		}
+
+		uint8 B = (ByteYaw != 0);
+		Ar.SerializeBits(&B, 1);
+
+		if (B)
+		{
+			Ar << ByteYaw;
+		}
+		else
+		{
+			ByteYaw = 0;
+		}
+
+		if (bArLoading)
+		{
+			YawRotation = FRotator::DecompressAxisFromByte(ByteYaw);
+		}
+
+		return true;
+	}
+
+	FMovementData()
+	{}
+
+	FMovementData(const FVector& Loc, float TimeStamp, float Forw, float Yaw)
+	{
+		Location = Loc;
+		ClientTimeStamp = TimeStamp;
+		Forward = Forw;
+		YawRotation = Yaw;
+	}
+};
 
 UCLASS()
 class FGNET_API AFGPlayer : public APawn
@@ -31,7 +95,7 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 	UPROPERTY(EditAnywhere, Category = Settings)
-	UFGPlayerSettings* PlayerSettings = nullptr;
+		UFGPlayerSettings* PlayerSettings = nullptr;
 
 	UFUNCTION(BlueprintPure)
 		bool IsBraking() const { return bBrake; }
@@ -40,7 +104,7 @@ public:
 		int32 GetPing() const;
 
 	UPROPERTY(EditAnywhere, Category = Debug)
-	TSubclassOf<UFGNetDebugWidget> DebugMenuClass;
+		TSubclassOf<UFGNetDebugWidget> DebugMenuClass;
 
 	UFUNCTION(Server, Unreliable)
 		void Server_SendYaw(float InYaw);
@@ -51,16 +115,16 @@ public:
 	void OnPickup(AFGPickup* Pickup);
 
 	UFUNCTION(Server, Unreliable)
-	void Server_OnPickup(AFGPickup* Pickup);
+		void Server_OnPickup(AFGPickup* Pickup);
 
 	UFUNCTION(Client, Reliable)
-	void Client_OnPickupRockets(int32 PickedUpRockets);
+		void Client_OnPickupRockets(int32 PickedUpRockets);
 
 	UFUNCTION(NetMulticast, Reliable)
-	void MultiCast_OnPickupRockets(int32 PickedUpRockets);
+		void MultiCast_OnPickupRockets(int32 PickedUpRockets);
 
 	UFUNCTION(NetMulticast, Unreliable)
-	void Multicast_SendLocation(const FVector& LocationToSend);
+		void Multicast_SendLocation(const FVector& LocationToSend);
 
 	void ShowDebugMenu();
 	void HideDebugMenu();
@@ -72,10 +136,10 @@ public:
 		void MultiCast_SendRotation(const FRotator& RotationToSend);
 
 	UFUNCTION(BlueprintPure)
-	int32 GetNumRockets() const { return NumRockets;}
+		int32 GetNumRockets() const { return NumRockets; }
 
 	UFUNCTION(BlueprintImplementableEvent, Category = Player, meta = (DisplayName = "On Num Rockets Changed"))
-	void BP_OnNumRcketsChanged(int32 NewNumRockets);
+		void BP_OnNumRcketsChanged(int32 NewNumRockets);
 
 	int32 GetNumActiveRockets() const;
 
@@ -84,66 +148,76 @@ public:
 	void SpawnRockets();
 
 	UFUNCTION(BlueprintImplementableEvent, Category = Health)
-	void BP_OnHealthChanged(int32 Health);
+		void BP_OnHealthChanged(int32 Health);
 
 	UFUNCTION(BlueprintCallable)
 		void OnTakeDamage(int32 DamageToTake);
 
 private:
+	FMovementData MovementData;
+
+	void AddMovementVelocity(float DeltaTime);
 
 	UFUNCTION(Server, Reliable)
-	void Server_TakeDamage(int32 DamageTaken);
+		void Server_TakeDamage(int32 DamageTaken);
 
 	UFUNCTION(Client, Reliable)
-	void Client_TakeDamage(int32 NewHealth);
+		void Client_ChangeHealth(int32 NewHealth);
 
 	UFUNCTION(NetMulticast, Reliable)
-	void MultiCast_TakeDamage(int32 DamageToTake);
+		void MultiCast_TakeDamage(int32 DamageToTake);
 
 
+	const float MaxMoveDeltaTime = .125f;
 
 	int32 ServerCurrentHealth = 0;
 
 	UPROPERTY(Replicated)
-	int32 CurrentHealth = 0;
+		int32 CurrentHealth = 0;
 
 	UPROPERTY(EditAnywhere, Category = Health)
-	int32 MaxHealth;
+		int32 MaxHealth;
 
 	int32 ServerNumRocket = 0;
 
 	UPROPERTY(Replicated)
-	int32 NumRockets = 0;
+		int32 NumRockets = 0;
 
 	FVector GetRocketStartLocation() const;
 
 	AFGRocket* GetFreeRocket() const;
 
+	UFUNCTION(Server, Unreliable)
+		void Server_SendMovement(FMovementData MoveData);
+
+	UFUNCTION(NetMulticast, Unreliable)
+		void MultiCast_SendMovement(FMovementData MoveData);
+
 	UFUNCTION(Server, Reliable)
-	void Server_FireRocket(AFGRocket* NewRocket, const FVector& RocketStartLocation, const FRotator& RocketFacingDirection);
+		void Server_FireRocket(AFGRocket* NewRocket, const FVector& RocketStartLocation, const FRotator& RocketFacingDirection);
 
 	UFUNCTION(NetMulticast, Reliable)
-	void MultiCast_FireRocket(AFGRocket* NewRocket, const FVector& RocketStartLocation, const FRotator& RocketFacingDirection);
+		void MultiCast_FireRocket(AFGRocket* NewRocket, const FVector& RocketStartLocation, const FRotator& RocketFacingDirection);
 
 	UFUNCTION(Client, Reliable)
-	void Client_RemoveRocket(AFGRocket* RocketToRemove);
+		void Client_RemoveRocket(AFGRocket* RocketToRemove);
 
 	UFUNCTION(BlueprintCallable)
-	void Cheat_IncreaseRockets(int32 InNumRockets);
+		void Cheat_IncreaseRockets(int32 InNumRockets);
 
 	UPROPERTY(Replicated, Transient)
-	TArray<AFGRocket*> RocketInstances;
+		TArray<AFGRocket*> RocketInstances;
 
 	UPROPERTY(EditAnywhere, Category = Weapon)
-	TSubclassOf<AFGRocket> RocketClass;
+		TSubclassOf<AFGRocket> RocketClass;
 
 	int32 MaxActiveRockets = 3;
 
 	float FireCooldownElapsed = 0.0f;
 
 	UPROPERTY(EditAnywhere, Category = Weapon)
-	bool bUnlimitedRockets = false;
- 
+		bool bUnlimitedRockets = false;
+
 
 	void Handle_Accelerate(float Value);
 	void Handle_Turn(float Value);
@@ -158,19 +232,19 @@ private:
 	bool bShowDebugMenu = false;
 
 	UPROPERTY(Replicated)
-	float ReplicatedYaw = 0.0f;
+		float ReplicatedYaw = 0.0f;
 
 	UPROPERTY(Replicated)
-	FVector ReplicatedLocation;
+		FVector ReplicatedLocation;
 
 	UPROPERTY(Transient)
-	UFGNetDebugWidget* DebugMenuInstance = nullptr;
+		UFGNetDebugWidget* DebugMenuInstance = nullptr;
 
 	FRotator InterpTargetRot;
 	FVector InterpTargetLoc;
 
 	UPROPERTY(EditAnywhere, Category = Movement)
-	float RotationSpeed = 0.0f;
+		float RotationSpeed = 0.0f;
 
 	UPROPERTY(EditAnywhere, Category = Movement)
 		float LocationSpeed = 0.0f;
@@ -182,6 +256,15 @@ private:
 	float Yaw = 0.0f;
 
 	bool bBrake = false;
+
+	float ClientTimeStamp = 0.0f;
+	float ServerTimeStamp;
+	float LastCorrectionDelta = 0.0f;
+
+	UPROPERTY(EditAnywhere, Category = Network)
+		bool bPerformNetworkSmoothing = true;
+
+	FVector OriginalMeshOffSet = FVector::ZeroVector;
 
 	UPROPERTY(VisibleDefaultsOnly, Category = Collision)
 		USphereComponent* CollisionComponent;

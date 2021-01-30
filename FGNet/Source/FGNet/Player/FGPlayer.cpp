@@ -52,6 +52,7 @@ void AFGPlayer::BeginPlay()
 	}
 
 	SpawnRockets();
+	OriginalMeshOffSet = MeshComponent->GetRelativeLocation();
 }
 
 void AFGPlayer::Tick(float DeltaTime)
@@ -62,8 +63,13 @@ void AFGPlayer::Tick(float DeltaTime)
 
 	if (!ensure(PlayerSettings != nullptr))
 		return;
-	if (IsLocallyControlled())
+
+	FFGFrameMovement FrameMovement = MovementComponent->CreateFrameMovement();
+
+	if (IsLocallyControlled()) 
 	{
+		ClientTimeStamp += DeltaTime;
+
 		const float Friction = IsBraking() ? PlayerSettings->BrakingFriction : PlayerSettings->Friction;
 		const float Alpha = FMath::Clamp(FMath::Abs(MovementVelocity / (PlayerSettings->MaxVelocity * 0.75f)), 0.0f, 1.0f);
 		const float TurnSpeed = FMath::InterpEaseOut(0.0f, PlayerSettings->TurnSpeedDefault, Alpha, 5.0f);
@@ -73,28 +79,29 @@ void AFGPlayer::Tick(float DeltaTime)
 		FQuat WantedFacingDirection = FQuat(FVector::UpVector, FMath::DegreesToRadians(Yaw));
 		MovementComponent->SetFacingRotation(WantedFacingDirection);
 
-		FFGFrameMovement FrameMovement = MovementComponent->CreateFrameMovement();
-
-		MovementVelocity += Forward * PlayerSettings->Acceleration * DeltaTime;
-		MovementVelocity = FMath::Clamp(MovementVelocity, -PlayerSettings->MaxVelocity, PlayerSettings->MaxVelocity);
+		AddMovementVelocity(DeltaTime);
 		MovementVelocity *= FMath::Pow(Friction, DeltaTime);
 
 		MovementComponent->ApplyGravity();
 		FrameMovement.AddDelta(GetActorForwardVector() * MovementVelocity * DeltaTime);
 		MovementComponent->Move(FrameMovement);
 
-		Server_SendLocation(GetActorLocation());
-		//Server_SendRotation(GetActorRotation());
-		Server_SendYaw(MovementComponent->GetFacingRotation().Yaw);
+
+		MovementData.SetData(GetActorLocation(), ClientTimeStamp, Forward, GetActorRotation().Yaw);
+		Server_SendMovement(MovementData);
 	}
 	else
 	{
-		const FVector NewLoc = FMath::VInterpTo(GetActorLocation(), ReplicatedLocation, DeltaTime, LocationSpeed);
-		SetActorLocation(NewLoc);
-		const FRotator NewRot = FMath::RInterpTo(GetActorRotation(), FRotator(0.0f, ReplicatedYaw, 0.0f), DeltaTime, RotationSpeed);
-		SetActorRotation(NewRot);
-		//MovementComponent->SetFacingRotation(FRotator(0.0f, ReplicatedYaw, 0.0f), 7.0f);
-		//SetActorRotation(MovementComponent->GetFacingRotation());
+		const float Friction = IsBraking() ? PlayerSettings->BrakingFriction : PlayerSettings->Friction;
+		MovementVelocity *= FMath::Pow(Friction, DeltaTime);
+		FrameMovement.AddDelta(GetActorForwardVector() * MovementVelocity * DeltaTime);
+		MovementComponent->Move(FrameMovement);
+
+		if (bPerformNetworkSmoothing)
+		{
+			const FVector NewRelativeLocation = FMath::VInterpTo(MeshComponent->GetRelativeLocation(), OriginalMeshOffSet, LastCorrectionDelta, 1.75f);
+			MeshComponent->SetRelativeLocation(NewRelativeLocation, false, nullptr, ETeleportType::TeleportPhysics);
+		}
 	}
 
 }
@@ -108,7 +115,7 @@ void AFGPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 
 	PlayerInputComponent->BindAction(TEXT("Brake"), IE_Pressed, this, &AFGPlayer::Handle_BrakePressed);
 	PlayerInputComponent->BindAction(TEXT("Brake"), IE_Released, this, &AFGPlayer::Handle_BrakeReleased);
-	PlayerInputComponent->BindAction(TEXT("DebugMenu"), IE_Pressed, this, &AFGPlayer::Handle_DebugMenuPressed);
+	//PlayerInputComponent->BindAction(TEXT("DebugMenu"), IE_Pressed, this, &AFGPlayer::Handle_DebugMenuPressed);
 	PlayerInputComponent->BindAction(TEXT("Fire"), IE_Pressed, this, &AFGPlayer::Handle_FirePressed);
 }
 
@@ -126,20 +133,30 @@ void AFGPlayer::Server_SendYaw_Implementation(float InYaw)
 	ReplicatedYaw = InYaw;
 }
 
-void AFGPlayer::OnPickup(AFGPickup* Pickup)
+
+void AFGPlayer::AddMovementVelocity(float DeltaTime)
 {
-	if(IsLocallyControlled())
-		Server_OnPickup(Pickup);
+	if (!ensure(PlayerSettings != nullptr))
+		return;
+
+	const float MaxVelocity = PlayerSettings->MaxVelocity;
+	const float Acceleration = PlayerSettings->Acceleration;
+	MovementVelocity += Forward * Acceleration * DeltaTime;
+	MovementVelocity = FMath::Clamp(MovementVelocity, -MaxVelocity, MaxVelocity);
 }
 
 void AFGPlayer::Server_TakeDamage_Implementation(int32 DamageTaken)
 {
 	ServerCurrentHealth -= DamageTaken;
-	Client_TakeDamage(ServerCurrentHealth);
+	if (ServerCurrentHealth < 0)
+	{
+		ServerCurrentHealth = 0;
+	}
+	Client_ChangeHealth(ServerCurrentHealth);
 	MultiCast_TakeDamage(DamageTaken);
 }
 
-void AFGPlayer::Client_TakeDamage_Implementation(int32 NewHealth)
+void AFGPlayer::Client_ChangeHealth_Implementation(int32 NewHealth)
 {
 	CurrentHealth = NewHealth;
 	BP_OnHealthChanged(CurrentHealth);
@@ -156,29 +173,53 @@ void AFGPlayer::MultiCast_TakeDamage_Implementation(int32 DamageToTake)
 
 void AFGPlayer::OnTakeDamage(int32 DamageToTake)
 {
-	if(IsLocallyControlled())
-	Server_TakeDamage(DamageToTake);
+	if (IsLocallyControlled())
+	{
+		CurrentHealth -= DamageToTake;
+		if (CurrentHealth <= 0)
+		{
+			CurrentHealth = 0;
+		}
+		Server_TakeDamage(DamageToTake);
+	}
+}
+
+
+void AFGPlayer::OnPickup(AFGPickup* Pickup)
+{
+	if (HasAuthority())
+	{
+		Server_OnPickup(Pickup);
+	}
+	else if(IsLocallyControlled())
+	{
+		Pickup->bReplicateSetActorHiddenInGame = false;
+		Pickup->SetActorHiddenInGame(true);
+	}
 }
 
 void AFGPlayer::Server_OnPickup_Implementation(AFGPickup* Pickup)
 {
 	ServerNumRocket += Pickup->NumRockets;
-	Client_OnPickupRockets(Pickup->NumRockets);
-	MultiCast_OnPickupRockets(Pickup->NumRockets);
+	Client_OnPickupRockets(ServerNumRocket);
+	MultiCast_OnPickupRockets(ServerNumRocket);
+	Pickup->DeActivatePickup();
 }
 
 void AFGPlayer::Client_OnPickupRockets_Implementation(int32 PickedUpRockets)
 {
-	NumRockets += PickedUpRockets;
-	BP_OnNumRcketsChanged(NumRockets);
+	NumRockets = PickedUpRockets;
+	//NumRockets += PickedUpRockets;
+	BP_OnNumRcketsChanged(PickedUpRockets);
 }
 
 void AFGPlayer::MultiCast_OnPickupRockets_Implementation(int32 PickedUpRockets)
 {
 	if (!IsLocallyControlled())
 	{
-		NumRockets += PickedUpRockets;
-		BP_OnNumRcketsChanged(NumRockets);
+		NumRockets = PickedUpRockets;
+		//NumRockets += PickedUpRockets;
+		BP_OnNumRcketsChanged(PickedUpRockets);
 	}
 }
 
@@ -269,7 +310,7 @@ void AFGPlayer::Handle_FirePressed()
 	FireRocket();
 }
 
-AFGRocket* AFGPlayer::GetFreeRocket() const 
+AFGRocket* AFGPlayer::GetFreeRocket() const
 {
 	for (AFGRocket* Rocket : RocketInstances)
 	{
@@ -283,13 +324,47 @@ AFGRocket* AFGPlayer::GetFreeRocket() const
 	return nullptr;
 }
 
-FVector AFGPlayer::GetRocketStartLocation() const 
+void AFGPlayer::Server_SendMovement_Implementation(FMovementData MoveData)
+{
+	MultiCast_SendMovement(MoveData);
+}
+
+void AFGPlayer::MultiCast_SendMovement_Implementation(FMovementData MoveData)
+{
+	if (!IsLocallyControlled())
+	{
+		Forward = MoveData.Forward;
+		const float DeltaTime = FMath::Min(MoveData.ClientTimeStamp - ClientTimeStamp, MaxMoveDeltaTime);
+		ClientTimeStamp = MoveData.ClientTimeStamp;
+		AddMovementVelocity(DeltaTime);
+		MovementComponent->SetFacingRotation(FRotator(0.0f, MoveData.YawRotation, 0.0f));
+
+		const FVector DeltaDiff = MoveData.Location - GetActorLocation();
+
+		if (DeltaDiff.SizeSquared() > FMath::Square(40.0))
+		{
+			if (bPerformNetworkSmoothing)
+			{
+				const FScopedPreventAttachedComponentMove PreventMeshMove(MeshComponent);
+				MovementComponent->UpdatedComponent->SetWorldLocation(MoveData.Location, false, nullptr, ETeleportType::TeleportPhysics);
+				LastCorrectionDelta = DeltaTime;
+			}
+			else
+			{
+				SetActorLocation(MoveData.Location);
+			}
+
+		}
+	}
+}
+
+FVector AFGPlayer::GetRocketStartLocation() const
 {
 	const FVector StartLoc = GetActorLocation() + GetActorForwardVector() * 100.0f;
 	return StartLoc;
 }
 
-void AFGPlayer::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const 
+void AFGPlayer::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
@@ -298,8 +373,8 @@ void AFGPlayer::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetim
 	DOREPLIFETIME(AFGPlayer, RocketInstances);
 	DOREPLIFETIME(AFGPlayer, NumRockets);
 	DOREPLIFETIME(AFGPlayer, CurrentHealth);
-
 }
+
 
 int32 AFGPlayer::GetNumActiveRockets() const
 {
@@ -403,7 +478,3 @@ void AFGPlayer::SpawnRockets()
 		}
 	}
 }
-
-
-
-
